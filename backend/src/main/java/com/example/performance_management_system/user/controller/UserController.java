@@ -7,6 +7,7 @@ import com.example.performance_management_system.user.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class UserController {
     // Create user
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN') or hasRole('HR')")
     public User createUser(@Valid @RequestBody CreateUserRequest request) {
         return service.createUser(
                 request.username,

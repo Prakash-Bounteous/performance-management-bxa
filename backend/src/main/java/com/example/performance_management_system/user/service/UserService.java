@@ -2,6 +2,7 @@ package com.example.performance_management_system.user.service;
 
 import com.example.performance_management_system.common.enums.Role;
 import com.example.performance_management_system.common.exception.BusinessException;
+import com.example.performance_management_system.config.security.SecurityUtil;
 import com.example.performance_management_system.role.model.RoleEntity;
 import com.example.performance_management_system.role.repository.RoleRepository;
 import com.example.performance_management_system.user.model.User;
@@ -48,6 +49,12 @@ public class UserService {
 
 
     public User createUser(String username, String password, Role role, Long managerId) {
+        String roleCheck = SecurityUtil.role();
+
+        if (!roleCheck.equals("ADMIN") && !roleCheck.equals("HR")) {
+            throw new BusinessException("Only HR or ADMIN can create users");
+        }
+
         if (repository.findByUsername(username).isPresent()) {
             throw new BusinessException("Username already exists");
         }
@@ -57,7 +64,7 @@ public class UserService {
 
         User user = new User();
         user.setUsername(username);
-        user.setPassword(password); // hashed later
+        user.setPassword(passwordEncoder.encode(password));
         user.setRole(roleEntity);
         user.setManagerId(managerId);
         user.setActive(true);
